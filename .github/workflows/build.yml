@@ -22,22 +22,21 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Locate Gradle Project Directory
-        id: locate-gradle
+      - name: Find Project Directory
+        id: find-dir
         run: |
-          GRADLE_DIR=$(find . -name "build.gradle" -o -name "build.gradle.kts" | head -n 1 | xargs dirname)
-          if [ -z "$GRADLE_DIR" ]; then
-            GRADLE_DIR="."
-          fi
-          echo "project_dir=$GRADLE_DIR" >> $GITHUB_OUTPUT
-          echo "Ditemukan direktori Gradle di: $GRADLE_DIR"
+          # Mencari folder yang memiliki file build.gradle secara otomatis
+          GRADLE_FILE=$(find . -name "build.gradle" -o -name "build.gradle.kts" | head -n 1)
+          PROJECT_DIR=$(dirname "$GRADLE_FILE")
+          echo "project_dir=$PROJECT_DIR" >> $GITHUB_OUTPUT
+          echo "Folder proyek ditemukan di: $PROJECT_DIR"
 
       - name: Grant execute permission for gradlew
         run: |
           find . -name "gradlew" -exec chmod +x {} \;
 
       - name: Build APK with Gradle Wrapper
-        working-directory: ${{ steps.locate-gradle.outputs.project_dir }}
+        working-directory: ${{ steps.find-dir.outputs.project_dir }}
         run: |
           ./gradlew assembleDebug
 
