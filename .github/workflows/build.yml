@@ -30,13 +30,21 @@ jobs:
             echo "Ketemu gradlew di: $PROJECT_DIR"
             chmod +x "$GRADLEW_PATH"
             cd "$PROJECT_DIR"
-            ./gradlew assembleDebug
           else
-            echo "File gradlew tidak ada di repo, pakai gradle sistem..."
             SETTINGS_PATH=$(find . -name "settings.gradle" -o -name "settings.gradle.kts" | head -n 1)
             PROJECT_DIR=$(dirname "$SETTINGS_PATH")
             echo "Ketemu proyek di: $PROJECT_DIR"
             cd "$PROJECT_DIR"
+          fi
+
+          # Otomatis mengaktifkan AndroidX & Jetifier agar tidak error lagi
+          echo "" >> gradle.properties
+          echo "android.useAndroidX=true" >> gradle.properties
+          echo "android.enableJetifier=true" >> gradle.properties
+
+          if [ -f "./gradlew" ]; then
+            ./gradlew assembleDebug
+          else
             gradle assembleDebug
           fi
 
